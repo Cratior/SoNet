@@ -1,0 +1,43 @@
+h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-top: 50px;
+  }
+  
+  form {
+    width: 80%;
+    margin: auto;
+    margin-top: 50px;
+  }
+  
+  label {
+    display: block;
+    margin-top: 20px;
+    font-size: 20px;
+  }
+  
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  button[type="submit"] {
+    display: block;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #1E90FF;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  #posts-container {
+    width: 80%;
+    margin: auto;
+    margin-top: 50px;
+  }
+  
