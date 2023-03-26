@@ -1,15 +1,16 @@
 const BIN_URL = "https://api.jsonbin.io/v3/b/642040aface6f33a22fce4b5";
 const API_KEY = "$2b$10$0DjS24xl07wRHutzdPvEUOI1H/2dzsCUVg9iDb.unyBAJKITYiVEe";
 const COOLDOWN_TIME = 10000; // 10 seconds cooldown
-const REFRESH_INTERVAL = 1000; // 5 seconds refresh interval
+const REFRESH_INTERVAL = 700; // 700 milliseconds refresh interval
 const DEV_KEYWORD = "$DEV@";
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
 let lastPostTime = 0;
 const addPostButton = document.getElementById("addPostButton");
 
 // Load existing posts
 async function loadPosts() {
-  const response = await fetch(BIN_URL, {
+  const response = await fetch(CORS_PROXY + BIN_URL, {
     headers: { "X-Master-Key": API_KEY },
   });
   const data = await response.json();
@@ -49,7 +50,7 @@ addPostButton.addEventListener("click", async function () {
           [new Date().getTime()]: { title: "Hi", content: "Hello World!" },
         };
 
-        const updateResponse = await fetch(BIN_URL, {
+        const updateResponse = await fetch(CORS_PROXY + BIN_URL, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +75,7 @@ addPostButton.addEventListener("click", async function () {
     }
 
     const postId = new Date().getTime();
-    const response = await fetch(BIN_URL, {
+    const response = await fetch(CORS_PROXY + BIN_URL, {
       method: "GET",
       headers: { "X-Master-Key": API_KEY },
     });
@@ -82,7 +83,7 @@ addPostButton.addEventListener("click", async function () {
     const posts = data.record;
     posts[postId] = { title: postTitle, content: postContent };
 
-    const updateResponse = await fetch(BIN_URL, {
+    const updateResponse = await fetch(CORS_PROXY + BIN_URL, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
