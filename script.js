@@ -40,7 +40,7 @@ const handleFormSubmit = async (event) => {
       sha: data.sha
     })
   };
-  const updateResponse = await fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/posts.json', options);
+  const updateResponse = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json', options);
   
   // Clear form inputs
   document.querySelector('#post-title').value = '';
@@ -54,7 +54,7 @@ const handleFormSubmit = async (event) => {
 
 // Function to load posts from GitHub
 const loadPosts = async () => {
-  const response = await fetch('https://api.github.com/repos/Cratior//contents/posts.json');
+  const response = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json');
   const data = await response.json();
   const decodedData = JSON.parse(atob(data.content));
   renderPosts(decodedData);
