@@ -1,4 +1,4 @@
-const BIN_URL = "https://api.jsonbin.io/v3/b/642040aface6f33a22fce4b5";
+const BIN_URL = "https://cors-anywhere.herokuapp.com/https://api.jsonbin.io/v3/b/642040aface6f33a22fce4b5";
 const API_KEY = "$2b$10$0DjS24xl07wRHutzdPvEUOI1H/2dzsCUVg9iDb.unyBAJKITYiVEe";
 const COOLDOWN_TIME = 10000; // 10 seconds cooldown
 const REFRESH_INTERVAL = 1000; // 5 seconds refresh interval
