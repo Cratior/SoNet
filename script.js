@@ -15,7 +15,7 @@ const handleFormSubmit = async (event) => {
   const newPost = { title, text, image, link };
   
   // Fetch existing posts from GitHub
-  const response = await fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/posts.json');
+  const response = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json');
   const data = await response.json();
   
   // Decode existing posts from base64 and parse JSON
