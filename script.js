@@ -1,83 +1,112 @@
-const form = document.querySelector('#post-form');
-const postsContainer = document.querySelector('#posts-container');
+const BIN_URL = "https://api.jsonbin.io/v3/b/642040aface6f33a22fce4b5";
+const API_KEY = "$2b$10$0DjS24xl07wRHutzdPvEUOI1H/2dzsCUVg9iDb.unyBAJKITYiVEe";
+const COOLDOWN_TIME = 10000; // 10 seconds cooldown
+const REFRESH_INTERVAL = 1000; // 5 seconds refresh interval
+const DEV_KEYWORD = "$DEV@";
 
-// Function to handle form submission
-const handleFormSubmit = async (event) => {
-  event.preventDefault();
-  
-  // Get form data
-  const title = document.querySelector('#post-title').value;
-  const text = document.querySelector('#post-text').value;
-  const image = document.querySelector('#post-image').value;
-  const link = document.querySelector('#post-link').value;
-  
-  // Create new post object
-  const newPost = { title, text, image, link };
-  
-  // Fetch existing posts from GitHub
-  const response = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json');
-  const data = await response.json();
-  
-  // Decode existing posts from base64 and parse JSON
-  const decodedData = JSON.parse(atob(data.content));
-  
-  // Add new post to existing posts
-  decodedData.push(newPost);
-  
-  // Encode updated posts as base64
-  const encodedData = btoa(JSON.stringify(decodedData));
-  
-  // Send updated file to GitHub
-  const options = {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer YOUR_GITHUB_TOKEN'
-    },
-    body: JSON.stringify({
-      message: 'Add new post',
-      content: encodedData,
-      sha: data.sha
-    })
-  };
-  const updateResponse = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json', options);
-  
-  // Clear form inputs
-  document.querySelector('#post-title').value = '';
-  document.querySelector('#post-text').value = '';
-  document.querySelector('#post-image').value = '';
-  document.querySelector('#post-link').value = '';
-  
-  // Refresh posts
-  loadPosts();
-};
+let lastPostTime = 0;
+const addPostButton = document.getElementById("addPostButton");
 
-// Function to load posts from GitHub
-const loadPosts = async () => {
-  const response = await fetch('https://api.github.com/repos/Cratior/SoNet/contents/posts.json');
-  const data = await response.json();
-  const decodedData = JSON.parse(atob(data.content));
-  renderPosts(decodedData);
-};
-
-// Function to render posts on page
-const renderPosts = (posts) => {
-  postsContainer.innerHTML = '';
-  posts.forEach(post => {
-    const postDiv = document.createElement('div');
-    postDiv.classList.add('post');
-    postDiv.innerHTML = `
-      <h2>${post.title}</h2>
-      <p>${post.text}</p>
-      <img src="${post.image}" alt="Post Image">
-      <a href="${post.link}">Read more</a>
-    `;
-    postsContainer.appendChild(postDiv);
+// Load existing posts
+async function loadPosts() {
+  const response = await fetch(BIN_URL, {
+    headers: { "X-Master-Key": API_KEY },
   });
-};
+  const data = await response.json();
+  const posts = data.record;
+  const postsDiv = document.getElementById("posts");
+  postsDiv.innerHTML = "";
+
+  const sortedPostIds = Object.keys(posts).sort((a, b) => b - a); // Sort post IDs in descending order
+
+  for (const postId of sortedPostIds) {
+    const postElement = document.createElement("div");
+    postElement.className = "post";
+    postElement.innerHTML = `
+      <h3>${posts[postId].title}</h3>
+      <p>${posts[postId].content}</p>
+    `;
+    postsDiv.appendChild(postElement);
+  }
+}
+
+// Add a new post
+addPostButton.addEventListener("click", async function () {
+  const currentTime = new Date().getTime();
+  if (currentTime - lastPostTime < COOLDOWN_TIME) {
+    alert("Please wait before posting again.");
+    return;
+  }
+
+  const postTitle = prompt("Enter your post title:");
+  const postContent = prompt("Enter your post content:");
+  if (postTitle && postContent) {
+    // Check for developer command
+    if (postTitle.includes(DEV_KEYWORD)) {
+      if (postContent.toLowerCase() === "clear") {
+        // Clear all posts and create a new one with "Hi" as title and "Hello World!" as content
+        const clearedPosts = {
+          [new Date().getTime()]: { title: "Hi", content: "Hello World!" },
+        };
+
+        const updateResponse = await fetch(BIN_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY,
+            "versioning": "false",
+          },
+          body: JSON.stringify(clearedPosts),
+        });
+
+        if (updateResponse.ok) {
+          lastPostTime = currentTime;
+          addPostButton.disabled = true;
+          setTimeout(() => {
+            addPostButton.disabled = false;
+          }, COOLDOWN_TIME);
+          loadPosts();
+        } else {
+          alert("Error: Could not clear posts");
+        }
+      }
+      return;
+    }
+
+    const postId = new Date().getTime();
+    const response = await fetch(BIN_URL, {
+      method: "GET",
+      headers: { "X-Master-Key": API_KEY },
+    });
+    const data = await response.json();
+    const posts = data.record;
+    posts[postId] = { title: postTitle, content: postContent };
+
+    const updateResponse = await fetch(BIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": API_KEY,
+        "versioning": "false",
+      },
+      body: JSON.stringify(posts),
+    });
+
+    if (updateResponse.ok) {
+      lastPostTime = currentTime;
+      addPostButton.disabled = true;
+      setTimeout(() => {
+        addPostButton.disabled = false;
+      }, COOLDOWN_TIME);
+      loadPosts();
+    } else {
+      alert("Error: Could not create post");
+    }
+  }
+});
 
 // Load posts on page load
 loadPosts();
 
-// Add form submit event listener
-form.addEventListener('submit', handleFormSubmit);
+// Periodically refresh posts
+setInterval(loadPosts, REFRESH_INTERVAL);
