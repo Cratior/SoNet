@@ -1,7 +1,16 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="200" height="200" fill="#00AEEF"/>
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url('path/to/my/custom/font.ttf');
+    }
+    text {
+      font-family: 'MyCustomFont', sans-serif;
+    }
+  </style>
+  <rect x="0" y="0" width="200" height="200" fill="#6c757d"/>
   <path d="M50 150 L100 100 L150 150" stroke="#FFF" stroke-width="15" fill="none"/>
   <path d="M100 50 L50 100 L100 150 L150 100 Z" fill="#FFF"/>
-  <path d="M100 50 L50 100 L100 150 L150 100 Z" stroke="#00AEEF" stroke-width="5" fill="none"/>
+  <path d="M100 50 L50 100 L100 150 L150 100 Z" stroke="#6c757d" stroke-width="5" fill="none"/>
   <text x="100" y="185" font-size="30" fill="#FFF" text-anchor="middle">SO-NET</text>
 </svg>
